@@ -1,0 +1,27 @@
+name: Docker Image Security Scan
+
+on: [push]
+
+jobs:
+  trivy_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        run: |
+          sudo apt update
+          sudo apt install docker.io -y
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
+
+      # Pull and scan the nginx Docker image
+      - name: Pull and scan Docker image
+        run: |
+          docker pull nginx
+          trivy image nginx
