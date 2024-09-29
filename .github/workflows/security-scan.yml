@@ -1,27 +1,39 @@
 name: Docker Image Security Scan
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Ensure this matches your default branch name
 
 jobs:
   trivy_scan:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Docker (optional, as GitHub Actions provides Docker by default)
       - name: Set up Docker
         run: |
           sudo apt update
           sudo apt install docker.io -y
 
+      # Step 3: Install Trivy
       - name: Install Trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
 
-      # Pull and scan the nginx Docker image
+      # Step 4: Pull and scan the nginx Docker image
       - name: Pull and scan Docker image
         run: |
           docker pull nginx
-          trivy image nginx
+          trivy image --exit-code 1 --severity HIGH,CRITICAL nginx
+
+      # Optional: Report results or take further actions based on scan results
+      - name: Output Trivy Scan Results
+        run: |
+          trivy image --format json --output trivy-report.json nginx
+          echo "Trivy scan completed, report generated."
