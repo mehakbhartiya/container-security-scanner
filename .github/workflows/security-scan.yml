@@ -1,6 +1,9 @@
 name: Docker Image Security Scan
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # or any branch you want this action to run on
 
 jobs:
   trivy_scan:
@@ -13,9 +16,7 @@ jobs:
       - name: Set up Docker
         run: |
           sudo apt update
-          sudo apt install docker.io -y
-          sudo systemctl start docker
-          sudo systemctl enable docker
+          sudo apt install -y docker.io
 
       - name: Install Trivy
         run: |
