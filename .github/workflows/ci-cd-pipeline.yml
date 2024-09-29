@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update APT and Install Docker
+        run: |
+          # Update package list
+          sudo apt-get update
+          
+          # Remove any existing containerd packages to resolve conflicts
+          sudo apt-get remove -y containerd || true
+          sudo apt-get purge -y containerd containerd.io || true
+          
+          # Clean up the package manager
+          sudo apt-get clean
+          sudo apt-get autoclean
+          sudo apt-get autoremove -y
+
+          # Install Docker
+          sudo apt-get install -y --fix-missing docker.io
+          
+      - name: Start Docker Service
+        run: |
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+      - name: Verify Docker Installation
+        run: |
+          sudo docker --version
+          sudo docker run hello-world
+
+      - name: Build and Run Your Application
+        run: |
+          # Here you can add steps to build your Docker image and run your application
+          # For example:
+          # sudo docker build -t your-image-name .
+          # sudo docker run -d your-image-name
