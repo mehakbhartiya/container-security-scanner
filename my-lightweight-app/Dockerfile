@@ -1,16 +1,13 @@
-FROM python:3.9-slim
+FROM alpine:latest
 
-# Set the working directory in the container
+# Install any necessary packages (if needed)
+RUN apk add --no-cache bash
+
+# Set the working directory
 WORKDIR /app
 
-# Copy the application code into the container
-COPY app.py .
+# Copy your application files (if you have any)
+COPY . .
 
-# Install Flask
-RUN pip install flask
-
-# Expose the application port
-EXPOSE 5000
-
-# Command to run the application
-CMD ["python", "app.py"]
+# Command to run your application (if you have one)
+CMD ["echo", "Hello from my lightweight app!"]

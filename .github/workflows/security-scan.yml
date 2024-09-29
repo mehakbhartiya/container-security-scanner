@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   security-scan:
@@ -16,24 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Build Docker Image
         run: |
-          # Replace your-image-name with the actual image name
-          docker build -t your-image-name .
+          cd my-lightweight-app
+          sudo docker build -t my-lightweight-app .
 
-      - name: Run Trivy Security Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: your-image-name
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
-          ignore-unfixed: true
+      - name: Install Trivy
+        run: |
+          # Install Trivy
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.30.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.30.0_Linux-64bit.deb
 
-      - name: Upload Trivy Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: trivy-report
-          path: trivy-report.json
+      - name: Run Security Scan
+        run: |
+          # Scan the Docker image for vulnerabilities
+          trivy image my-lightweight-app

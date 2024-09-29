@@ -43,7 +43,14 @@ jobs:
           sudo docker --version
           sudo docker run hello-world
 
-      - name: Build and Run Your Application
+      - name: Build Docker Image
         run: |
+          cd my-lightweight-app
           sudo docker build -t my-lightweight-app .
-          sudo docker run -d -p 5000:5000 my-lightweight-app
+
+      - name: Run Your Application
+        run: |
+          # Here you can add steps to run your application
+          # For example:
+          # sudo docker run -d my-lightweight-app
+
