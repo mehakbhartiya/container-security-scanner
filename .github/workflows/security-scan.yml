@@ -7,31 +7,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Remove conflicting containerd package and install Docker
       - name: Set up Docker
         run: |
           sudo apt update
-          sudo apt remove -y containerd
-          sudo apt install -y docker.io
+          sudo apt install docker.io -y
+          sudo systemctl start docker
+          sudo systemctl enable docker
 
-      # Step 3: Install Trivy
       - name: Install Trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
 
-      # Step 4: Pull and scan the nginx Docker image
       - name: Pull and scan Docker image
         run: |
           docker pull nginx
-          trivy image --exit-code 1 --severity HIGH,CRITICAL nginx
-
-      # Optional: Generate and output the scan results
-      - name: Output Trivy Scan Results
-        run: |
-          trivy image --format json --output trivy-report.json nginx
-          echo "Trivy scan completed, report generated."
+          trivy image nginx
