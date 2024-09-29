@@ -1,9 +1,6 @@
 name: Docker Image Security Scan
 
-on:
-  push:
-    branches:
-      - main  # Ensure this matches your default branch name
+on: [push]
 
 jobs:
   trivy_scan:
@@ -14,11 +11,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Docker (optional, as GitHub Actions provides Docker by default)
+      # Step 2: Remove conflicting containerd package and install Docker
       - name: Set up Docker
         run: |
           sudo apt update
-          sudo apt install docker.io -y
+          sudo apt remove -y containerd
+          sudo apt install -y docker.io
 
       # Step 3: Install Trivy
       - name: Install Trivy
@@ -32,7 +30,7 @@ jobs:
           docker pull nginx
           trivy image --exit-code 1 --severity HIGH,CRITICAL nginx
 
-      # Optional: Report results or take further actions based on scan results
+      # Optional: Generate and output the scan results
       - name: Output Trivy Scan Results
         run: |
           trivy image --format json --output trivy-report.json nginx
